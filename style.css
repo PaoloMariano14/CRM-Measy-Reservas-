@@ -1,0 +1,73 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f4f4;
+}
+h1 {
+  text-align: center;
+}
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+}
+form input, form button {
+  padding: 8px;
+  font-size: 14px;
+}
+#search {
+  margin-bottom: 15px;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+th {
+  background-color: #333;
+  color: white;
+}
+tr.alerta-visita td, tr.alerta-prueba td {
+  background-color: #fff3cd;
+}
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+@media (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  thead tr {
+    display: none;
+  }
+  td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    margin-bottom: 10px;
+  }
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    font-weight: bold;
+  }
+}
