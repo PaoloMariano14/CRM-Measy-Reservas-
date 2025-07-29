@@ -1,0 +1,1 @@
+// Lógica JS adicional futura si se requiere
