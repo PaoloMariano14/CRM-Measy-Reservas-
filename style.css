@@ -1,32 +1,49 @@
-
+/* Estilos generales */
 body {
   font-family: Arial, sans-serif;
-  margin: 20px;
-  background-color: #f9f9f9;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
 }
 
 h1 {
-  color: #0D5C4D;
   text-align: center;
+  color: #0D5C4D;
 }
 
-form {
-  margin-bottom: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
+/* Buscador y formulario */
 input, button {
-  padding: 8px;
-  font-size: 14px;
+  margin: 8px 0;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-button[type="submit"] {
+input[type="text"], input[type="date"] {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
   background-color: #0D5C4D;
   color: white;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
+}
+
+/* Tabla */
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 20px;
 }
 
 table {
@@ -43,33 +60,22 @@ thead {
 th, td {
   padding: 10px;
   border: 1px solid #ddd;
-  text-align: left;
+  text-align: center;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
+.action-btn {
+  margin: 0 4px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  table, thead, tbody, th, td, tr {
-    display: block;
-  }
+.edit-btn {
+  background-color: gold;
+}
 
-  thead {
-    display: none;
-  }
-
-  td {
-    position: relative;
-    padding-left: 50%;
-    border: none;
-    border-bottom: 1px solid #ddd;
-  }
-
-  td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 10px;
-    font-weight: bold;
-  }
+.delete-btn {
+  background-color: red;
+  color: white;
 }
