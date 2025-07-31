@@ -1,101 +1,133 @@
-// Obtener elementos
-const form = document.getElementById("client-form");
-const tableBody = document.querySelector("#client-table tbody");
-const searchInput = document.getElementById("search");
+const form = document.getElementById('client-form');
+const tableBody = document.querySelector('#client-table tbody');
+const searchInput = document.getElementById('search');
+const advisorFilter = document.getElementById('filterAdvisor');
 
-// Función para agregar un cliente
-form.addEventListener("submit", function (e) {
+let clients = [];
+
+form.addEventListener('submit', function (e) {
   e.preventDefault();
 
-  // Obtener valores
-  const name = document.getElementById("name").value;
-  const address = document.getElementById("address").value;
-  const phone = document.getElementById("phone").value;
-  const hours = document.getElementById("hours").value;
-  const lastVisit = document.getElementById("lastVisit").value;
-  const trialStart = document.getElementById("trialStart").value;
-  const notes = document.getElementById("notes").value;
+  const name = document.getElementById('name').value;
+  const address = document.getElementById('address').value;
+  const phone = document.getElementById('phone').value;
+  const hours = document.getElementById('hours').value;
+  const lastVisit = new Date(document.getElementById('lastVisit').value);
+  const trialStart = new Date(document.getElementById('trialStart').value);
+  const notes = document.getElementById('notes').value;
+  const advisor = document.getElementById('advisor').value;
 
-  // Calcular fechas
-  const nextVisitDate = calculateDate(lastVisit, 6);
-  const trialEndDate = calculateDate(trialStart, 10);
+  const nextVisit = new Date(lastVisit);
+  nextVisit.setDate(nextVisit.getDate() + 6);
 
-  // Crear fila
-  const row = document.createElement("tr");
+  const trialEnd = new Date(trialStart);
+  trialEnd.setDate(trialEnd.getDate() + 10);
 
-  // Dirección como link de Google Maps
-  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  const client = {
+    name,
+    address,
+    phone,
+    hours,
+    nextVisit,
+    trialEnd,
+    notes,
+    advisor
+  };
 
-  // WhatsApp
-  const whatsappLink = `https://wa.me/${phone}`;
-
-  row.innerHTML = `
-    <td>${name}</td>
-    <td><a href="${mapsLink}" target="_blank">${address}</a></td>
-    <td><a href="${whatsappLink}" target="_blank">${phone}</a></td>
-    <td>${hours}</td>
-    <td>${nextVisitDate}</td>
-    <td>${trialEndDate}</td>
-    <td>${notes}</td>
-    <td>
-      <button class="action-btn edit-btn">📝</button>
-      <button class="action-btn delete-btn">🗑️</button>
-    </td>
-  `;
-
-  // Botón editar
-  row.querySelector(".edit-btn").addEventListener("click", () => {
-    editRow(row);
-  });
-
-  // Botón borrar
-  row.querySelector(".delete-btn").addEventListener("click", () => {
-    const confirmDelete = confirm("¿Estás seguro de que quieres eliminar este cliente?");
-    if (confirmDelete) row.remove();
-  });
-
-  // Agregar fila a la tabla
-  tableBody.appendChild(row);
-
+  clients.push(client);
+  renderTable();
   form.reset();
 });
 
-// Función para editar fila con prompts
-function editRow(row) {
-  const cells = row.querySelectorAll("td");
-  const name = prompt("Nuevo nombre del local:", cells[0].textContent);
-  const address = prompt("Nueva dirección:", cells[1].textContent);
-  const phone = prompt("Nuevo teléfono:", cells[2].textContent);
-  const hours = prompt("Nuevo horario:", cells[3].textContent);
-  const notes = prompt("Descripción o notas:", cells[6].textContent);
+function renderTable() {
+  tableBody.innerHTML = '';
+  const searchTerm = searchInput.value.toLowerCase();
+  const selectedAdvisor = advisorFilter.value;
 
-  // Actualizar datos
-  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-  const whatsappLink = `https://wa.me/${phone}`;
-  cells[0].textContent = name;
-  cells[1].innerHTML = `<a href="${mapsLink}" target="_blank">${address}</a>`;
-  cells[2].innerHTML = `<a href="${whatsappLink}" target="_blank">${phone}</a>`;
-  cells[3].textContent = hours;
-  cells[6].textContent = notes;
-}
+  clients.forEach((client, index) => {
+    if (
+      (client.name.toLowerCase().includes(searchTerm) ||
+      client.address.toLowerCase().includes(searchTerm) ||
+      client.phone.toLowerCase().includes(searchTerm) ||
+      client.advisor.toLowerCase().includes(searchTerm)) &&
+      (selectedAdvisor === '' || client.advisor === selectedAdvisor)
+    ) {
+      const row = document.createElement('tr');
 
-// Función para calcular fechas
-function calculateDate(dateStr, daysToAdd) {
-  const date = new Date(dateStr);
-  date.setDate(date.getDate() + daysToAdd);
-  return date.toISOString().split("T")[0];
-}
+      const visitClass = isToday(client.nextVisit) ? 'visit-warning' : '';
+      const trialClass = isTomorrow(client.trialEnd) ? 'trial-warning' : '';
 
-// Buscador dinámico
-searchInput.addEventListener("input", function () {
-  const query = this.value.toLowerCase();
-  const rows = tableBody.querySelectorAll("tr");
-
-  rows.forEach((row) => {
-    const cells = row.querySelectorAll("td");
-    const match = Array.from(cells).some((cell, i) =>
-      i <= 2 && cell.textContent.toLowerCase().includes(query)
-    );
-    row.style.display = match ? "" : "none";
+      row.innerHTML = `
+        <td>${client.name}</td>
+        <td><a href="https://www.google.com/maps/search/${encodeURIComponent(client.address)}" target="_blank">${client.address}</a></td>
+        <td><a href="https://wa.me/${client.phone}" target="_blank">${client.phone}</a></td>
+        <td>${client.hours}</td>
+        <td class="${visitClass}">${formatDate(client.nextVisit)}</td>
+        <td class="${trialClass}">${formatDate(client.trialEnd)}</td>
+        <td>${client.notes}</td>
+        <td>${client.advisor}</td>
+        <td>
+          <button class="action-btn edit-btn" onclick="editClient(${index})">📝</button>
+          <button class="action-btn delete-btn" onclick="deleteClient(${index})">🗑️</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    }
   });
-});
+}
+
+function formatDate(date) {
+  return date.toISOString().split('T')[0];
+}
+
+function isToday(date) {
+  const today = new Date();
+  return date.toDateString() === today.toDateString();
+}
+
+function isTomorrow(date) {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return date.toDateString() === tomorrow.toDateString();
+}
+
+function editClient(index) {
+  const client = clients[index];
+  const newName = prompt("Nuevo nombre del local", client.name);
+  const newAddress = prompt("Nueva dirección", client.address);
+  const newPhone = prompt("Nuevo teléfono", client.phone);
+  const newHours = prompt("Nuevos horarios", client.hours);
+  const newLastVisit = prompt("Nueva fecha de última visita (YYYY-MM-DD)", formatDate(new Date(client.nextVisit.setDate(client.nextVisit.getDate() - 6))));
+  const newTrialStart = prompt("Nueva fecha de inicio de prueba (YYYY-MM-DD)", formatDate(new Date(client.trialEnd.setDate(client.trialEnd.getDate() - 10))));
+  const newNotes = prompt("Nueva descripción", client.notes);
+  const newAdvisor = prompt("Nuevo asesor", client.advisor);
+
+  if (newName && newAddress && newPhone && newHours && newLastVisit && newTrialStart && newAdvisor) {
+    client.name = newName;
+    client.address = newAddress;
+    client.phone = newPhone;
+    client.hours = newHours;
+    client.notes = newNotes;
+    client.advisor = newAdvisor;
+
+    const lastVisitDate = new Date(newLastVisit);
+    const trialStartDate = new Date(newTrialStart);
+
+    client.nextVisit = new Date(lastVisitDate.setDate(lastVisitDate.getDate() + 6));
+    client.trialEnd = new Date(trialStartDate.setDate(trialStartDate.getDate() + 10));
+
+    renderTable();
+  }
+}
+
+function deleteClient(index) {
+  if (confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
+    clients.splice(index, 1);
+    renderTable();
+  }
+}
+
+searchInput.addEventListener('input', renderTable);
+advisorFilter.addEventListener('change', renderTable);
+
+  
