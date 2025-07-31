@@ -10,8 +10,13 @@
   <div class="container">
     <h1>CRM de Clientes</h1>
 
-    <!-- Buscador -->
-    <input type="text" id="search" placeholder="Buscar por nombre, dirección o teléfono" />
+    <!-- Buscador y Filtro por Asesor -->
+    <input type="text" id="search" placeholder="Buscar por nombre, dirección, teléfono o asesor" />
+    <select id="filterAdvisor">
+      <option value="">Filtrar por asesor</option>
+      <option value="Jorge">Jorge</option>
+      <option value="Paolo">Paolo</option>
+    </select>
 
     <!-- Formulario para agregar locales -->
     <form id="client-form">
@@ -24,6 +29,7 @@
       <input type="date" id="trialStart" required />
       <label for="trialStart">Inicio de prueba gratuita (10 días)</label>
       <input type="text" id="notes" placeholder="Descripción o notas del local" />
+      <input type="text" id="advisor" placeholder="Nombre del asesor (Jorge o Paolo)" required />
       <button type="submit">Agregar local</button>
     </form>
 
@@ -39,6 +45,7 @@
             <th>Próxima visita</th>
             <th>Fin de prueba gratuita</th>
             <th>Descripción</th>
+            <th>Asesor</th>
             <th>Acciones</th>
           </tr>
         </thead>
