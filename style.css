@@ -1,4 +1,3 @@
-/* Estilos generales */
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
@@ -19,15 +18,14 @@ h1 {
   color: #0D5C4D;
 }
 
-/* Buscador y formulario */
-input, button {
+input, button, select {
   margin: 8px 0;
   padding: 10px;
   width: 100%;
   box-sizing: border-box;
 }
 
-input[type="text"], input[type="date"] {
+input[type="text"], input[type="date"], select {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
@@ -61,6 +59,14 @@ th, td {
   padding: 10px;
   border: 1px solid #ddd;
   text-align: center;
+}
+
+td.visit-warning {
+  background-color: #FFFACD; /* amarillo claro */
+}
+
+td.trial-warning {
+  background-color: #FFD1D1; /* rojo claro */
 }
 
 .action-btn {
