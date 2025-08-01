@@ -18,11 +18,17 @@ h1 {
   color: #0D5C4D;
 }
 
-input, button, select {
+input, button, select, label {
   margin: 8px 0;
   padding: 10px;
   width: 100%;
   box-sizing: border-box;
+  font-size: 1rem;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
 }
 
 input[type="text"], input[type="date"], select {
@@ -36,6 +42,30 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #0a4c3f;
+}
+
+/* Filtros */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 600px) {
+  .filters {
+    flex-direction: row;
+  }
+
+  .filters input,
+  .filters select {
+    flex: 1;
+  }
 }
 
 /* Tabla */
@@ -48,6 +78,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  font-size: 0.95rem;
 }
 
 thead {
@@ -64,13 +95,13 @@ th, td {
 td.visit-warning {
   background-color: #FFFACD;
   font-weight: bold;
-  color: #B8860B; /* amarillo oscuro */
+  color: #B8860B;
 }
 
 td.trial-warning {
   background-color: #FFD1D1;
   font-weight: bold;
-  color: #8B0000; /* rojo fuerte */
+  color: #8B0000;
 }
 
 .action-btn {
