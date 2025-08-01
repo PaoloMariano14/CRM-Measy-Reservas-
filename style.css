@@ -62,11 +62,15 @@ th, td {
 }
 
 td.visit-warning {
-  background-color: #FFFACD; /* amarillo claro */
+  background-color: #FFFACD;
+  font-weight: bold;
+  color: #B8860B; /* amarillo oscuro */
 }
 
 td.trial-warning {
-  background-color: #FFD1D1; /* rojo claro */
+  background-color: #FFD1D1;
+  font-weight: bold;
+  color: #8B0000; /* rojo fuerte */
 }
 
 .action-btn {
