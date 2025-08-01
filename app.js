@@ -47,10 +47,11 @@ function renderTable() {
   clients.forEach((client, index) => {
     if (
       (client.name.toLowerCase().includes(searchTerm) ||
-      client.address.toLowerCase().includes(searchTerm) ||
-      client.phone.toLowerCase().includes(searchTerm) ||
-      client.advisor.toLowerCase().includes(searchTerm)) &&
-      (selectedAdvisor.trim().toLowerCase() === '' || client.advisor.trim().toLowerCase() === selectedAdvisor.trim().toLowerCase())
+        client.address.toLowerCase().includes(searchTerm) ||
+        client.phone.toLowerCase().includes(searchTerm) ||
+        client.advisor.toLowerCase().includes(searchTerm)) &&
+      (selectedAdvisor.trim().toLowerCase() === '' ||
+        client.advisor.trim().toLowerCase() === selectedAdvisor.trim().toLowerCase())
     ) {
       const row = document.createElement('tr');
 
