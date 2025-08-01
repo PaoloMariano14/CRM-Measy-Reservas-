@@ -41,7 +41,7 @@ form.addEventListener('submit', function (e) {
 
 function renderTable() {
   tableBody.innerHTML = '';
-  const searchTerm = searchInput.value.toLowerCase();
+  const searchTerm = searchInput.value.trim().toLowerCase();
   const selectedAdvisor = advisorFilter.value;
 
   clients.forEach((client, index) => {
@@ -50,7 +50,7 @@ function renderTable() {
       client.address.toLowerCase().includes(searchTerm) ||
       client.phone.toLowerCase().includes(searchTerm) ||
       client.advisor.toLowerCase().includes(searchTerm)) &&
-      (selectedAdvisor (selectedAdvisor.trim().toLowerCase() === '' || client.advisor.trim().toLowerCase() === selectedAdvisor.trim().toLowerCase())
+      (selectedAdvisor.trim().toLowerCase() === '' || client.advisor.trim().toLowerCase() === selectedAdvisor.trim().toLowerCase())
     ) {
       const row = document.createElement('tr');
 
@@ -129,5 +129,3 @@ function deleteClient(index) {
 
 searchInput.addEventListener('input', renderTable);
 advisorFilter.addEventListener('change', renderTable);
-
-  
