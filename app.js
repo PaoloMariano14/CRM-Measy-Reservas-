@@ -50,7 +50,7 @@ function renderTable() {
       client.address.toLowerCase().includes(searchTerm) ||
       client.phone.toLowerCase().includes(searchTerm) ||
       client.advisor.toLowerCase().includes(searchTerm)) &&
-      (selectedAdvisor === '' || client.advisor.toLowerCase() === selectedAdvisor.toLowerCase())
+      (selectedAdvisor (selectedAdvisor.trim().toLowerCase() === '' || client.advisor.trim().toLowerCase() === selectedAdvisor.trim().toLowerCase())
     ) {
       const row = document.createElement('tr');
 
