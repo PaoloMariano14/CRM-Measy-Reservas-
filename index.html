@@ -10,14 +10,22 @@
   <div class="container">
     <h1>CRM de Clientes</h1>
 
-    <!-- Buscador y Filtro por Asesor -->
+    <!-- Buscador y Filtros -->
     <div class="filters">
       <input type="text" id="search" placeholder="Buscar por nombre, dirección, teléfono o asesor" />
       <select id="filterAdvisor">
-        <option value="">Filtrar por asesor</option>
+        <option value="">Todos los asesores</option>
         <option value="Jorge">Jorge</option>
         <option value="Paolo">Paolo</option>
+        <option value="Maxi">Maxi</option>
+        <option value="Ro">Ro</option>
       </select>
+    </div>
+
+    <!-- Botones de ordenamiento -->
+    <div class="sort-buttons">
+      <button type="button" onclick="sortByNextVisit()">📅 Ordenar por visita más próxima</button>
+      <button type="button" onclick="sortByTrialEnd()">⏳ Ordenar por fin de prueba más próxima</button>
     </div>
 
     <!-- Formulario para agregar locales -->
@@ -34,7 +42,7 @@
       <input type="date" id="trialStart" required />
 
       <input type="text" id="notes" placeholder="Descripción o notas del local" />
-      <input type="text" id="advisor" placeholder="Nombre del asesor (Jorge o Paolo)" required />
+      <input type="text" id="advisor" placeholder="Nombre del asesor (Jorge, Paolo, Maxi o Ro)" required />
 
       <button type="submit">Agregar local</button>
     </form>
