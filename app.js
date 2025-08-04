@@ -5,7 +5,7 @@ const advisorFilter = document.getElementById('filterAdvisor');
 
 let clients = [];
 
-form.addEventListener('submit', function (e) {
+form.addEventListener('submit', async function (e) {
   e.preventDefault();
 
   const name = document.getElementById('name').value;
@@ -28,16 +28,35 @@ form.addEventListener('submit', function (e) {
     address,
     phone,
     hours,
-    nextVisit,
-    trialEnd,
+    nextVisit: nextVisit.toISOString(),
+    trialEnd: trialEnd.toISOString(),
     notes,
     advisor
   };
 
+  const res = await fetch('/api/clients', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(client)
+  });
+
+  const savedClient = await res.json();
+  client.id = savedClient.id;
   clients.push(client);
   renderTable();
   form.reset();
 });
+
+function formatDate(date) {
+  return new Date(date).toISOString().split('T')[0];
+}
+
+function daysUntil(date) {
+  const today = new Date();
+  const target = new Date(date);
+  const diffTime = target - today;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
 
 function renderTable() {
   tableBody.innerHTML = '';
@@ -50,21 +69,15 @@ function renderTable() {
         client.address.toLowerCase().includes(searchTerm) ||
         client.phone.toLowerCase().includes(searchTerm) ||
         client.advisor.toLowerCase().includes(searchTerm)) &&
-      (selectedAdvisor.trim().toLowerCase() === '' ||
-        client.advisor.trim().toLowerCase() === selectedAdvisor.trim().toLowerCase())
+      (selectedAdvisor === '' || client.advisor === selectedAdvisor)
     ) {
       const row = document.createElement('tr');
 
       const visitDaysLeft = daysUntil(client.nextVisit);
       const trialDaysLeft = daysUntil(client.trialEnd);
 
-      let visitClass = '';
-      if (visitDaysLeft === 0) visitClass = 'visit-warning';
-      else if (visitDaysLeft <= 2) visitClass = 'critical-warning';
-
-      let trialClass = '';
-      if (trialDaysLeft === 1) trialClass = 'trial-warning';
-      else if (trialDaysLeft <= 2) trialClass = 'critical-warning';
+      let visitClass = visitDaysLeft <= 2 ? (visitDaysLeft === 1 ? 'visit-warning' : 'critical-warning') : '';
+      let trialClass = trialDaysLeft <= 2 ? (trialDaysLeft === 1 ? 'trial-warning' : 'critical-warning') : '';
 
       row.innerHTML = `
         <td>${client.name}</td>
@@ -86,56 +99,59 @@ function renderTable() {
   });
 }
 
-function formatDate(date) {
-  return date.toISOString().split('T')[0];
-}
-
-function daysUntil(date) {
-  const today = new Date();
-  const target = new Date(date);
-  const diffTime = target - today;
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-}
-
-function editClient(index) {
+async function editClient(index) {
   const client = clients[index];
   const newName = prompt("Nuevo nombre del local", client.name);
   const newAddress = prompt("Nueva dirección", client.address);
   const newPhone = prompt("Nuevo teléfono", client.phone);
   const newHours = prompt("Nuevos horarios", client.hours);
-  const newLastVisit = prompt("Nueva fecha de última visita (YYYY-MM-DD)", formatDate(new Date(client.nextVisit.setDate(client.nextVisit.getDate() - 6))));
-  const newTrialStart = prompt("Nueva fecha de inicio de prueba (YYYY-MM-DD)", formatDate(new Date(client.trialEnd.setDate(client.trialEnd.getDate() - 10))));
+  const newLastVisit = prompt("Nueva fecha de última visita (YYYY-MM-DD)", formatDate(new Date(client.nextVisit).setDate(new Date(client.nextVisit).getDate() - 6)));
+  const newTrialStart = prompt("Nueva fecha de inicio de prueba (YYYY-MM-DD)", formatDate(new Date(client.trialEnd).setDate(new Date(client.trialEnd).getDate() - 10)));
   const newNotes = prompt("Nueva descripción", client.notes);
   const newAdvisor = prompt("Nuevo asesor", client.advisor);
 
   if (newName && newAddress && newPhone && newHours && newLastVisit && newTrialStart && newAdvisor) {
-    client.name = newName;
-    client.address = newAddress;
-    client.phone = newPhone;
-    client.hours = newHours;
-    client.notes = newNotes;
-    client.advisor = newAdvisor;
-
     const lastVisitDate = new Date(newLastVisit);
     const trialStartDate = new Date(newTrialStart);
 
-    client.nextVisit = new Date(lastVisitDate.setDate(lastVisitDate.getDate() + 6));
-    client.trialEnd = new Date(trialStartDate.setDate(trialStartDate.getDate() + 10));
+    const updatedClient = {
+      id: client.id,
+      name: newName,
+      address: newAddress,
+      phone: newPhone,
+      hours: newHours,
+      notes: newNotes,
+      advisor: newAdvisor,
+      nextVisit: new Date(lastVisitDate.setDate(lastVisitDate.getDate() + 6)).toISOString(),
+      trialEnd: new Date(trialStartDate.setDate(trialStartDate.getDate() + 10)).toISOString()
+    };
 
+    await fetch(`/api/clients/${client.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedClient)
+    });
+
+    clients[index] = updatedClient;
     renderTable();
   }
 }
 
-function deleteClient(index) {
+async function deleteClient(index) {
+  const client = clients[index];
   if (confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
+    await fetch(`/api/clients/${client.id}`, { method: 'DELETE' });
     clients.splice(index, 1);
     renderTable();
   }
 }
 
 function add5DaysVisit(index) {
-  clients[index].nextVisit.setDate(clients[index].nextVisit.getDate() + 5);
-  renderTable();
+  const client = clients[index];
+  const newVisitDate = new Date(client.nextVisit);
+  newVisitDate.setDate(newVisitDate.getDate() + 5);
+  client.nextVisit = newVisitDate.toISOString();
+  editClient(index);
 }
 
 function sortByNextVisit() {
@@ -150,3 +166,10 @@ function sortByTrialEnd() {
 
 searchInput.addEventListener('input', renderTable);
 advisorFilter.addEventListener('change', renderTable);
+
+// Cargar clientes desde la base de datos al iniciar
+window.addEventListener('DOMContentLoaded', async () => {
+  const res = await fetch('/api/clients');
+  clients = await res.json();
+  renderTable();
+});
