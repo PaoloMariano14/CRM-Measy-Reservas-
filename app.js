@@ -55,21 +55,30 @@ function renderTable() {
     ) {
       const row = document.createElement('tr');
 
-      const visitClass = isToday(client.nextVisit) ? 'visit-warning' : '';
-      const trialClass = isTomorrow(client.trialEnd) ? 'trial-warning' : '';
+      const visitDaysLeft = daysUntil(client.nextVisit);
+      const trialDaysLeft = daysUntil(client.trialEnd);
+
+      let visitClass = '';
+      if (visitDaysLeft === 0) visitClass = 'visit-warning';
+      else if (visitDaysLeft <= 2) visitClass = 'critical-warning';
+
+      let trialClass = '';
+      if (trialDaysLeft === 1) trialClass = 'trial-warning';
+      else if (trialDaysLeft <= 2) trialClass = 'critical-warning';
 
       row.innerHTML = `
         <td>${client.name}</td>
         <td><a href="https://www.google.com/maps/search/${encodeURIComponent(client.address)}" target="_blank">${client.address}</a></td>
         <td><a href="https://wa.me/${client.phone}" target="_blank">${client.phone}</a></td>
         <td>${client.hours}</td>
-        <td class="${visitClass}">${formatDate(client.nextVisit)}</td>
-        <td class="${trialClass}">${formatDate(client.trialEnd)}</td>
+        <td class="${visitClass}">${formatDate(client.nextVisit)}<br><small>Faltan ${visitDaysLeft} días</small></td>
+        <td class="${trialClass}">${formatDate(client.trialEnd)}<br><small>Quedan ${trialDaysLeft} días</small></td>
         <td>${client.notes}</td>
         <td>${client.advisor}</td>
         <td>
           <button class="action-btn edit-btn" onclick="editClient(${index})">📝</button>
           <button class="action-btn delete-btn" onclick="deleteClient(${index})">🗑️</button>
+          <button class="action-btn" onclick="add5DaysVisit(${index})">➕ +5 días visita</button>
         </td>
       `;
       tableBody.appendChild(row);
@@ -81,15 +90,11 @@ function formatDate(date) {
   return date.toISOString().split('T')[0];
 }
 
-function isToday(date) {
+function daysUntil(date) {
   const today = new Date();
-  return date.toDateString() === today.toDateString();
-}
-
-function isTomorrow(date) {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  return date.toDateString() === tomorrow.toDateString();
+  const target = new Date(date);
+  const diffTime = target - today;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
 function editClient(index) {
@@ -126,6 +131,21 @@ function deleteClient(index) {
     clients.splice(index, 1);
     renderTable();
   }
+}
+
+function add5DaysVisit(index) {
+  clients[index].nextVisit.setDate(clients[index].nextVisit.getDate() + 5);
+  renderTable();
+}
+
+function sortByNextVisit() {
+  clients.sort((a, b) => daysUntil(a.nextVisit) - daysUntil(b.nextVisit));
+  renderTable();
+}
+
+function sortByTrialEnd() {
+  clients.sort((a, b) => daysUntil(a.trialEnd) - daysUntil(b.trialEnd));
+  renderTable();
 }
 
 searchInput.addEventListener('input', renderTable);
