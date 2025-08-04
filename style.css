@@ -57,8 +57,29 @@ button:hover {
   margin-bottom: 20px;
 }
 
+.sort-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sort-buttons button {
+  background-color: #eee;
+  color: #0D5C4D;
+  border: 1px solid #0D5C4D;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.sort-buttons button:hover {
+  background-color: #0D5C4D;
+  color: white;
+}
+
 @media (min-width: 600px) {
-  .filters {
+  .filters,
+  .sort-buttons {
     flex-direction: row;
   }
 
@@ -104,8 +125,14 @@ td.trial-warning {
   color: #8B0000;
 }
 
+td.critical-warning {
+  background-color: #ff9999;
+  font-weight: bold;
+  color: #660000;
+}
+
 .action-btn {
-  margin: 0 4px;
+  margin: 3px;
   padding: 5px 10px;
   border: none;
   border-radius: 4px;
